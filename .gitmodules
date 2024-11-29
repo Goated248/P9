@@ -1,0 +1,6 @@
+[submodule "bill-app/Billed-app-FR-Back"]
+	path = bill-app/Billed-app-FR-Back
+	url = https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-back
+[submodule "bill-app/Billed-app-FR-Front"]
+	path = bill-app/Billed-app-FR-Front
+	url = https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-Front
