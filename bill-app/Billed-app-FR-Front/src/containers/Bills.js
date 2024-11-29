@@ -1,7 +1,7 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 import { formatDate, formatStatus } from "../app/format.js"
 import Logout from "./Logout.js"
-import { bills } from '../fixtures/bills.js'
+
 
 
 export default class {
@@ -28,36 +28,37 @@ export default class {
     $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;' class="bill-proof-container"><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`)
     $('#modaleFile').modal('show')
   }
-//changer pour retourner les données de la fixture
-getBills = () => {
-  if (this.store) {
-    return this.store
-    .bills()
-    .list()
-    .then(snapshot => {
-      const bills = snapshot
-        .map(doc => {
-          try {
-            return {
-              ...doc,
-              date: formatDate(doc.date),
-              status: formatStatus(doc.status)
+
+
+  getBills = () => {
+    if (this.store) {
+      return this.store
+      .bills()
+      .list()
+      .then(snapshot => {
+        const bills = snapshot
+          .map(doc => {
+            try {
+              return {
+                ...doc,
+                date: formatDate(doc.date),
+                status: formatStatus(doc.status)
+              }
+            } catch(e) {
+              // if for some reason, corrupted data was introduced, we manage here failing formatDate function
+              // log the error and return unformatted date in that case
+              console.log(e,'for',doc)
+              return {
+                ...doc,
+                date: doc.date,
+                status: formatStatus(doc.status)
+              }
             }
-          } catch(e) {
-            // if for some reason, corrupted data was introduced, we manage here failing formatDate function
-            // log the error and return unformatted date in that case
-            console.log(e,'for',doc)
-            return {
-              ...doc,
-              date: doc.date,
-              status: formatStatus(doc.status)
-            }
-          }
-        })
-        console.log('length', bills.length)
-      return bills
-    })
+          })
+          console.log('length', bills.length)
+        return bills
+      })
+    }
   }
-}
   
 }
