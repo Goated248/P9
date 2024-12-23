@@ -84,10 +84,8 @@ const mockedBills = {
   },
 }
 
-export default {
-  bills() {
-    return mockedBills
-    //return {}
-  },
-}
+
+  export default {
+    bills: jest.fn(() => mockedBills) // Mocking bills() pour retourner mockedBills
+  }
 
