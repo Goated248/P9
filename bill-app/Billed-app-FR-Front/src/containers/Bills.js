@@ -58,6 +58,28 @@ export default class {
         
         return bills
       })
+
+      .catch(error => {
+        
+      
+        let errorContainer = this.document.querySelector("#error-container");
+      
+        // Créer dynamiquement le conteneur si non trouvé
+        if (!errorContainer) {
+          errorContainer = this.document.createElement("div");
+          errorContainer.id = "error-container";
+          this.document.body.appendChild(errorContainer); // Ajouter au DOM
+        }
+      
+        // Afficher l'erreur dans le conteneur
+        errorContainer.textContent = error.message;
+        errorContainer.style.display = "block"; // Rendre visible le conteneur
+      
+       
+        throw error; // Relancer l'erreur si nécessaire
+      });
+      
+
     }
   }
   

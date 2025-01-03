@@ -10,7 +10,7 @@ import NewBill from "../containers/NewBill.js";
 import { ROUTES_PATH } from "../constants/routes.js";
 import router from "../app/Router.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import mockStore from "../__mocks__/store";
+//import mockStore from "../__mocks__/store";
 
 
 
@@ -67,13 +67,13 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => expect(window.alert).toHaveBeenCalledTimes(1));
 
       // Vérifier que l'alerte a été appelée avec le message correct
-      expect(window.alert).toHaveBeenCalledWith('Seules les extensions jpg, jpeg, et png sont autorisées.');
+      expect(window.alert).toHaveBeenCalledWith("Veuillez télécharger un fichier avec une extension jpg, jpeg ou png.");
     });
   });
 });
 
 
-
+//test POST
 
 describe("When I fill out the form and click on send", () => {
   test("Then the form should be submitted", () => {
@@ -112,6 +112,40 @@ describe("When I fill out the form and click on send", () => {
 });
 
 
+
+
+describe("Given I am connected as an employee", () => {
+  it("Then it should call store.bills().create and update fileUrl, fileName, and billId", async () => {
+
+    const mockCreate = jest.fn().mockResolvedValue({ fileUrl: "http://test.com", key: "123"});
+    Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+    window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }));
+    // Mock the store
+    const store = {
+      bills: jest.fn(() => ({
+        create: mockCreate,
+      })),
+    };
+
+    const newBill = new NewBill({
+      document,
+      onNavigate: jest.fn(),
+      store,
+      localStorage: window.localStorage,
+    });
+
+    const inputFile = screen.getByTestId("file");
+    const validFile = new File(["dummy content"], "test.jpg", { type: "image/jpeg" });
+
+    fireEvent.change(inputFile, { target: { files: [validFile] } });
+  
+    // Assertions
+    await waitFor(() => expect(store.bills().create).toHaveBeenCalled());
+  
+    expect(newBill.fileUrl).toBe("http://test.com");
+    expect(newBill.billId).toBe("123");
+  });
+});
 
 
 

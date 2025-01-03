@@ -9,10 +9,12 @@ import { bills } from "../fixtures/bills.js"
 import Bills from "../containers/Bills.js";
 import { formatDate, formatStatus } from "../app/format.js";
 
-import { ROUTES_PATH} from "../constants/routes.js";
+import { ROUTES_PATH, ROUTES} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
-
+import mockStore from "../__mocks__/store"
 import router from "../app/Router.js";
+
+jest.mock("../app/Store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -172,62 +174,51 @@ describe("When there are bills", () => {
 
 
 
-jest.mock("../app/format.js"); // Mock des fonctions formatDate et formatStatus
+//TEST GET
 
-describe("Given I am connected as an Employee and I am on Bills page", () => {
-  describe("When getBills is called and formatDate throws an error", () => {
-    test("Then it should log the error and return unformatted data", async () => {
-      // Mock console.log pour vérifier son appel
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
-      // Mock de store avec des données corrompues
-      const store = {
-        bills: jest.fn(() => ({
-          list: jest.fn(() =>
-            Promise.resolve([
-              { id: "1", date: "invalid-date", status: "pending" },
-            ])
-          ),
-        })),
-      };
-
-      // Mock formatDate pour provoquer une erreur
-      formatDate.mockImplementation(() => {
-        throw new Error("Invalid date format");
+describe("Given I am connected as an employee", () => {
+  describe("When I navigate to Bills", () => {
+    describe("When an error occurs on API", () => {
+      beforeEach(() => {
+        jest.spyOn(mockStore, "bills");
+        Object.defineProperty(window, "localStorage", { value: localStorageMock });
+        window.localStorage.setItem("user", JSON.stringify({ type: "Employee" }));
+        const root = document.createElement("div");
+        root.setAttribute("id", "root");
+        document.body.appendChild(root);
+        router();
       });
 
-      // Mock formatStatus pour retourner la valeur brute (le statut brut)
-      formatStatus.mockImplementation((status) => status);
+      test("fetches bills from an API and fails with 404 message error", async () => {
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            list: () => {
+              return Promise.reject(new Error("Erreur 404"));
+            },
+          };
+        });
 
-      // Instanciation de Bills
-      const billsPage = new Bills({
-        document,
-        onNavigate: jest.fn(),
-        store,
-        localStorage: window.localStorage,
+        window.onNavigate(ROUTES_PATH.Bills);
+        await new Promise(process.nextTick);
+      const message = await screen.getAllByText(/Erreur 404/)
+      expect(message).toBeTruthy()
       });
 
-      // Appel de getBills
-      const result = await billsPage.getBills();
+      test("fetches bills from an API and fails with 500 message error", async () => {
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            list: () => {
+              return Promise.reject(new Error("Erreur 500"));
+            },
+          };
+        });
 
-      // Vérifie que console.log est appelé avec l'erreur et les données corrompues
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.any(Error),
-        "for",
-        { id: "1", date: "invalid-date", status: "pending" }
-      );
-
-      // Vérifie que les données non formatées sont retournées
-      expect(result).toEqual([
-        {
-          id: "1",
-          date: "invalid-date", // Retourne la date non formatée
-          status: "pending", // Statut non formaté (ceci est maintenant correct)
-        },
-      ]);
-
-      // Nettoyage
-      consoleSpy.mockRestore();
+        window.onNavigate(ROUTES_PATH.Bills);
+        await new Promise(process.nextTick);
+      const message = await screen.getAllByText(/Erreur 500/)
+      expect(message).toBeTruthy()
+      });
     });
   });
 });

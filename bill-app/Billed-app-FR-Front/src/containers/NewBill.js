@@ -17,24 +17,27 @@ export default class NewBill {
   }
   handleChangeFile = e => {
     e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
+    const fileInput = this.document.querySelector(`input[data-testid="file"]`);
+    const file = fileInput.files[0];
+    
+    // Vérification de l'extension du fichier
+    if (file) {
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+        const fileName = file.name;
 
-     // Vérification de l'extension
-     const allowedExtensions = ["jpg", "jpeg", "png"]
-     const fileExtension = fileName.split(".").pop().toLowerCase()
-     if (!allowedExtensions.includes(fileExtension)) {
-         alert("Seules les extensions jpg, jpeg, et png sont autorisées.")
-         e.target.value = ""
-         return
-     }
+        // Si l'extension du fichier n'est pas autorisée, afficher un message d'erreur
+        if (!allowedExtensions.exec(fileName)) {
+            alert("Veuillez télécharger un fichier avec une extension jpg, jpeg ou png.");
+            fileInput.value = "";
+            return;
+        }
+    }
 
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
-    console.log("FormData created:", formData)
+   
     
 
     this.store
@@ -46,7 +49,7 @@ export default class NewBill {
         }
       })
       .then(({fileUrl, key}) => {
-        console.log("File successfully uploaded:", { fileUrl, key });
+       
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
