@@ -76,7 +76,7 @@ export default class {
         errorContainer.style.display = "block"; // Rendre visible le conteneur
       
        
-        throw error; // Relancer l'erreur si nécessaire
+        throw error; 
       });
       
 

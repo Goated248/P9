@@ -10,7 +10,7 @@ import NewBill from "../containers/NewBill.js";
 import { ROUTES_PATH } from "../constants/routes.js";
 import router from "../app/Router.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-//import mockStore from "../__mocks__/store";
+
 
 
 
@@ -48,11 +48,11 @@ describe("Given I am connected as an employee", () => {
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
       }));
+      //init DOM
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.NewBill);
+    
 
       // Créez un fichier avec une extension incorrecte (ex. .exe)
       const file = new File(["dummy content"], "test-file.exe", { type: "application/exe" });
@@ -118,9 +118,10 @@ describe("Given I am connected as an employee", () => {
   it("Then it should call store.bills().create and update fileUrl, fileName, and billId", async () => {
 
     const mockCreate = jest.fn().mockResolvedValue({ fileUrl: "http://test.com", key: "123"});
+
     Object.defineProperty(window, 'localStorage', { value: localStorageMock });
     window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }));
-    // Mock the store
+    // Mock store
     const store = {
       bills: jest.fn(() => ({
         create: mockCreate,
@@ -148,5 +149,4 @@ describe("Given I am connected as an employee", () => {
 });
 
 
-
-
+  

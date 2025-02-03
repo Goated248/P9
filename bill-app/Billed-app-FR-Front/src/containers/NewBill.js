@@ -20,6 +20,7 @@ export default class NewBill {
     const fileInput = this.document.querySelector(`input[data-testid="file"]`);
     const file = fileInput.files[0];
     
+ 
     // Vérification de l'extension du fichier
     if (file) {
         const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
@@ -54,6 +55,7 @@ export default class NewBill {
         this.fileUrl = fileUrl
         this.fileName = fileName
       }).catch(error => console.error(error))
+      
   }
 
 

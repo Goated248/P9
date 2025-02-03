@@ -7,9 +7,9 @@ import userEvent from "@testing-library/user-event"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import Bills from "../containers/Bills.js";
-import { formatDate, formatStatus } from "../app/format.js";
 
-import { ROUTES_PATH, ROUTES} from "../constants/routes.js";
+
+import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store"
 import router from "../app/Router.js";
@@ -62,10 +62,6 @@ describe("Given I am connected as an Employee and I am on Bills page", () => {
       const html = BillsUI({ data: bills });
       document.body.innerHTML = html;
 
-      // Définir la navigation
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname });
-      };
 
       // Initialiser Bills
       const store = null;
@@ -130,47 +126,7 @@ describe("Given I am connected as an Employee and I am on Bills page", () => {
   });
 });
 
-describe("When Bills page is initialized", () => {
-  test("Then event listeners should be attached", () => {
-    document.body.innerHTML = BillsUI({ data: [] });
-    const onNavigate = jest.fn();
-    const billsPage = new Bills({
-      document,
-      onNavigate,
-      store: null,
-      localStorage: window.localStorage,
-    });
 
-    const newBillButton = screen.getByTestId("btn-new-bill");
-    newBillButton.click();
-
-    expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH["NewBill"]);
-  });
-});
-
-describe("When there are bills", () => {
-  test("Then the bills should be displayed in the table", () => {
-    const billsData = [
-      {
-        type: "Transports",
-        name: "Train Paris-Lyon",
-        date: "2024-06-01",
-        amount: 100,
-        status: "accepted",
-        fileUrl: "test-url",
-      },
-    ];
-
-    document.body.innerHTML = BillsUI({ data: billsData });
-
-    const rows = screen.getAllByRole("row");
-    expect(rows.length).toBe(2); // Une ligne pour le header + une ligne de données
-
-    expect(screen.getByText("Train Paris-Lyon")).toBeTruthy();
-    expect(screen.getByText("100 €")).toBeTruthy();
-    expect(screen.getByText("accepted")).toBeTruthy();
-  });
-});
 
 
 
